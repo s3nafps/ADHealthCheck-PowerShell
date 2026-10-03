@@ -30,7 +30,7 @@ jobs:
       run:
         shell: ${{ matrix.shell }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Pester and PSScriptAnalyzer
         run: |
@@ -53,7 +53,7 @@ jobs:
     name: Rule reference is up to date
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Regenerate docs/rules.md
         shell: pwsh
         run: ./build.ps1 -Task Docs
