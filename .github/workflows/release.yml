@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      PSGALLERY_API_KEY: ${{ secrets.PSGALLERY_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag matches the manifest version
+        shell: pwsh
+        run: |
+          $version = (Import-PowerShellDataFile ./src/ADHealthCheck/ADHealthCheck.psd1).ModuleVersion
+          if ("v$version" -ne '${{ github.ref_name }}') { throw "Tag ${{ github.ref_name }} does not match module version $version" }
+
+      - name: Test and package
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module Pester -MinimumVersion 5.5.0 -Force -SkipPublisherCheck
+          Install-Module PSScriptAnalyzer -Force
+          ./build.ps1 -Task Analyze, Test, Package
+          Compress-Archive -Path ./out/ADHealthCheck -DestinationPath ./out/ADHealthCheck-${{ github.ref_name }}.zip
+
+      - name: Publish to the PowerShell Gallery
+        if: ${{ env.PSGALLERY_API_KEY != '' }}
+        shell: pwsh
+        run: |
+          $path = (Get-ChildItem ./out/ADHealthCheck -Directory | Select-Object -First 1).FullName
+          Publish-Module -Path $path -NuGetApiKey $env:PSGALLERY_API_KEY
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/ADHealthCheck-${{ github.ref_name }}.zip
+          generate_release_notes: true

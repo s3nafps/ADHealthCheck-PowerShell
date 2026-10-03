@@ -1,0 +1,467 @@
+{
+  "Tool": "ADHealthCheck",
+  "ToolVersion": "1.0.0",
+  "Domain": "contoso.com",
+  "Forest": "contoso.com",
+  "Server": "dc01.contoso.com",
+  "GeneratedAt": "2026-10-03T01:49:28.2497087Z",
+  "DurationSeconds": 0.4,
+  "Summary": {
+    "Score": 46,
+    "Grade": "F",
+    "Total": 27,
+    "Pass": 18,
+    "Warning": 6,
+    "Fail": 2,
+    "Error": 0,
+    "Skipped": 1,
+    "FailedBySeverity": {
+      "Critical": 1,
+      "High": 1,
+      "Medium": 0,
+      "Low": 0,
+      "Info": 0
+    }
+  },
+  "Results": [
+    {
+      "Id": "ADHC-ACC-001",
+      "Category": "Accounts",
+      "Title": "Stale enabled user accounts",
+      "Severity": "Medium",
+      "Status": "Pass",
+      "Message": "No enabled user accounts are older than 90 days without a logon.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Confirm with the owners, then disable the accounts and move them to a quarantine OU before deletion.",
+      "References": [
+        "https://learn.microsoft.com/services-hub/unified/health/remediation-steps-ad/regularly-check-for-and-remove-inactive-user-accounts-in-active-directory"
+      ],
+      "DurationMs": 34.7
+    },
+    {
+      "Id": "ADHC-ACC-002",
+      "Category": "Accounts",
+      "Title": "Stale enabled computer accounts",
+      "Severity": "Low",
+      "Status": "Pass",
+      "Message": "No enabled computer accounts are older than 90 days without a logon.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Disable computer accounts that have not authenticated within the threshold and delete them after a grace period.",
+      "References": [
+        "https://learn.microsoft.com/powershell/module/activedirectory/search-adaccount"
+      ],
+      "DurationMs": 7.0
+    },
+    {
+      "Id": "ADHC-ACC-003",
+      "Category": "Accounts",
+      "Title": "Passwords that never expire",
+      "Severity": "Medium",
+      "Status": "Warning",
+      "Message": "1 enabled account(s) have passwords that never expire.",
+      "AffectedCount": 1,
+      "Details": [
+        "alice"
+      ],
+      "Recommendation": "Move service accounts to group Managed Service Accounts (gMSA). For people, remove the flag or enforce a long passphrase with a fine-grained password policy.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/security/group-managed-service-accounts/group-managed-service-accounts-overview"
+      ],
+      "DurationMs": 5.7
+    },
+    {
+      "Id": "ADHC-ACC-004",
+      "Category": "Accounts",
+      "Title": "Accounts that do not require a password",
+      "Severity": "High",
+      "Status": "Pass",
+      "Message": "No enabled accounts have PasswordNotRequired set.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Clear the flag with Set-ADUser -PasswordNotRequired $false and set a strong password on each account.",
+      "References": [
+        "https://learn.microsoft.com/troubleshoot/windows-server/active-directory/useraccountcontrol-manipulate-account-properties"
+      ],
+      "DurationMs": 2.4
+    },
+    {
+      "Id": "ADHC-ACC-005",
+      "Category": "Accounts",
+      "Title": "Reversible encryption or DES-only Kerberos",
+      "Severity": "High",
+      "Status": "Pass",
+      "Message": "No enabled accounts use reversible encryption or DES-only Kerberos.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Clear AllowReversiblePasswordEncryption and \"Use only Kerberos DES encryption types\", then reset the password so new keys are generated.",
+      "References": [
+        "https://learn.microsoft.com/windows/security/threat-protection/security-policy-settings/store-passwords-using-reversible-encryption"
+      ],
+      "DurationMs": 3.7
+    },
+    {
+      "Id": "ADHC-ACC-006",
+      "Category": "Accounts",
+      "Title": "Built-in Administrator account",
+      "Severity": "Medium",
+      "Status": "Pass",
+      "Message": "The built-in Administrator is enabled with a password set 30 days ago.",
+      "AffectedCount": 0,
+      "Details": [
+        "Account: Administrator",
+        "Last logon: 1 days ago",
+        "Password age: 30 days"
+      ],
+      "Recommendation": "Use named admin accounts for daily work, rotate the built-in Administrator password and keep it in a vault, or disable it if your recovery process allows.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/ad-ds/plan/security-best-practices/appendix-d--securing-built-in-administrator-accounts-in-active-directory"
+      ],
+      "DurationMs": 17.7
+    },
+    {
+      "Id": "ADHC-DEL-001",
+      "Category": "Delegation",
+      "Title": "Unconstrained delegation on non-DC computers",
+      "Severity": "Critical",
+      "Status": "Fail",
+      "Message": "1 non-DC computer(s) are trusted for unconstrained delegation.",
+      "AffectedCount": 1,
+      "Details": [
+        "APP01"
+      ],
+      "Recommendation": "Replace unconstrained delegation with constrained or resource-based constrained delegation, and add admins to Protected Users.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/security/kerberos/kerberos-constrained-delegation-overview"
+      ],
+      "DurationMs": 3.7
+    },
+    {
+      "Id": "ADHC-DNS-001",
+      "Category": "DNS",
+      "Title": "Domain controllers are registered in DNS",
+      "Severity": "High",
+      "Status": "Pass",
+      "Message": "All 2 domain controller(s) are registered in DNS.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "On the missing DC, run nltest /dsregdns or restart the Netlogon service, then check that DNS dynamic updates are allowed for the zone.",
+      "References": [
+        "https://learn.microsoft.com/troubleshoot/windows-server/networking/verify-srv-dns-records-have-been-created"
+      ],
+      "DurationMs": 7.0
+    },
+    {
+      "Id": "ADHC-GPO-001",
+      "Category": "Group Policy",
+      "Title": "Unlinked Group Policy Objects",
+      "Severity": "Low",
+      "Status": "Warning",
+      "Message": "1 GPO(s) are not linked to any site, domain or OU.",
+      "AffectedCount": 1,
+      "Details": [
+        "Old Kiosk Settings"
+      ],
+      "Recommendation": "Back up and delete GPOs that are no longer needed, or document why they are kept.",
+      "References": [
+        "https://learn.microsoft.com/powershell/module/grouppolicy/backup-gpo"
+      ],
+      "DurationMs": 4.2
+    },
+    {
+      "Id": "ADHC-GPO-002",
+      "Category": "Group Policy",
+      "Title": "Empty or fully disabled Group Policy Objects",
+      "Severity": "Low",
+      "Status": "Pass",
+      "Message": "No empty or fully disabled GPOs were found.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Remove empty GPOs, or re-enable the section that holds settings if it was disabled by mistake.",
+      "References": [
+        "https://learn.microsoft.com/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/jj134176(v=ws.11)"
+      ],
+      "DurationMs": 3.4
+    },
+    {
+      "Id": "ADHC-INF-001",
+      "Category": "Infrastructure",
+      "Title": "Domain and forest functional level",
+      "Severity": "Medium",
+      "Status": "Pass",
+      "Message": "Domain (Windows2016Domain) and forest (Windows2016Forest) meet the minimum functional level.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Retire domain controllers running older Windows Server versions, then raise the domain and forest functional levels.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/ad-ds/active-directory-functional-levels"
+      ],
+      "DurationMs": 14.8
+    },
+    {
+      "Id": "ADHC-INF-002",
+      "Category": "Infrastructure",
+      "Title": "FSMO roles are held by existing domain controllers",
+      "Severity": "High",
+      "Status": "Pass",
+      "Message": "All FSMO roles are held by current domain controllers.",
+      "AffectedCount": 0,
+      "Details": [
+        "DomainNamingMaster: dc01.contoso.com",
+        "InfrastructureMaster: dc02.contoso.com",
+        "PDCEmulator: dc01.contoso.com",
+        "RIDMaster: dc01.contoso.com",
+        "SchemaMaster: dc01.contoso.com"
+      ],
+      "Recommendation": "Transfer the role to a healthy DC with Move-ADDirectoryServerOperationMasterRole, or seize it if the old holder is permanently gone.",
+      "References": [
+        "https://learn.microsoft.com/troubleshoot/windows-server/active-directory/transfer-or-seize-operation-master-roles-in-ad-ds"
+      ],
+      "DurationMs": 16.6
+    },
+    {
+      "Id": "ADHC-INF-003",
+      "Category": "Infrastructure",
+      "Title": "Domain controller service ports are reachable",
+      "Severity": "High",
+      "Status": "Skipped",
+      "Message": "Network checks were skipped (-SkipNetworkCheck).",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Confirm the DC services are running and that firewalls between clients and DCs allow the AD ports. LDAPS (636) failing usually means no valid DC certificate.",
+      "References": [
+        "https://learn.microsoft.com/troubleshoot/windows-server/networking/service-overview-and-network-port-requirements"
+      ],
+      "DurationMs": 0.0
+    },
+    {
+      "Id": "ADHC-INF-004",
+      "Category": "Infrastructure",
+      "Title": "Domain controller operating systems are supported",
+      "Severity": "High",
+      "Status": "Pass",
+      "Message": "All domain controllers run a supported operating system.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Replace unsupported domain controllers with Windows Server 2019 or later and plan upgrades for versions nearing end of support.",
+      "References": [
+        "https://learn.microsoft.com/lifecycle/products/?products=windows"
+      ],
+      "DurationMs": 3.7
+    },
+    {
+      "Id": "ADHC-INF-005",
+      "Category": "Infrastructure",
+      "Title": "Domain controller and Global Catalog redundancy",
+      "Severity": "High",
+      "Status": "Pass",
+      "Message": "2 writable domain controllers and 2 Global Catalogs.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Run at least two writable domain controllers per domain and make at least two of them Global Catalogs.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/ad-ds/plan/planning-domain-controller-placement"
+      ],
+      "DurationMs": 5.8
+    },
+    {
+      "Id": "ADHC-INF-006",
+      "Category": "Infrastructure",
+      "Title": "AD Recycle Bin is enabled",
+      "Severity": "Medium",
+      "Status": "Pass",
+      "Message": "The AD Recycle Bin is enabled.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Enable it with Enable-ADOptionalFeature \"Recycle Bin Feature\" -Scope ForestOrConfigurationSet -Target <forest>. This cannot be undone.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/ad-ds/get-started/adac/active-directory-recycle-bin"
+      ],
+      "DurationMs": 2.3
+    },
+    {
+      "Id": "ADHC-KRB-001",
+      "Category": "Kerberos",
+      "Title": "Accounts without Kerberos pre-authentication (AS-REP roasting)",
+      "Severity": "High",
+      "Status": "Pass",
+      "Message": "All enabled accounts require Kerberos pre-authentication.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Clear \"Do not require Kerberos preauthentication\" on each account. If an application needs it, give that account a long random password.",
+      "References": [
+        "https://attack.mitre.org/techniques/T1558/004/"
+      ],
+      "DurationMs": 2.8
+    },
+    {
+      "Id": "ADHC-KRB-002",
+      "Category": "Kerberos",
+      "Title": "User accounts with service principal names (Kerberoasting)",
+      "Severity": "High",
+      "Status": "Warning",
+      "Message": "1 user account(s) have an SPN. None are privileged.",
+      "AffectedCount": 1,
+      "Details": [
+        "bob: MSSQLSvc/sql01.contoso.com:1433"
+      ],
+      "Recommendation": "Remove SPNs from privileged accounts. Move services to gMSAs, or use 25+ character random passwords and AES-only encryption on remaining service accounts.",
+      "References": [
+        "https://attack.mitre.org/techniques/T1558/003/"
+      ],
+      "DurationMs": 66.4
+    },
+    {
+      "Id": "ADHC-KRB-003",
+      "Category": "Kerberos",
+      "Title": "krbtgt password age",
+      "Severity": "High",
+      "Status": "Fail",
+      "Message": "The krbtgt password was last set 912 days ago (limit 180).",
+      "AffectedCount": 1,
+      "Details": [
+        "krbtgt password age: 912 days"
+      ],
+      "Recommendation": "Reset the krbtgt password twice, waiting for full replication between resets, using Microsoft's New-KrbtgtKeys.ps1 script.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/ad-ds/manage/ad-forest-recovery-resetting-the-krbtgt-password"
+      ],
+      "DurationMs": 4.1
+    },
+    {
+      "Id": "ADHC-LAPS-001",
+      "Category": "Endpoint",
+      "Title": "LAPS coverage of workstations and member servers",
+      "Severity": "High",
+      "Status": "Warning",
+      "Message": "LAPS manages 66.7% of 3 computer(s) (Windows LAPS).",
+      "AffectedCount": 1,
+      "Details": [
+        "APP01"
+      ],
+      "Recommendation": "Deploy Windows LAPS through Group Policy or Intune to every workstation and member server, and restrict who can read the passwords.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/laps/laps-overview"
+      ],
+      "DurationMs": 12.5
+    },
+    {
+      "Id": "ADHC-POL-001",
+      "Category": "Policy",
+      "Title": "Default domain password and lockout policy",
+      "Severity": "High",
+      "Status": "Warning",
+      "Message": "The default password policy is below recommended values.",
+      "AffectedCount": 1,
+      "Details": [
+        "Minimum length is 10 (recommended 14)"
+      ],
+      "Recommendation": "Require at least 14 characters, keep complexity on, remember 24 passwords, never allow reversible encryption, and set an account lockout threshold.",
+      "References": [
+        "https://learn.microsoft.com/windows/security/threat-protection/security-policy-settings/password-policy"
+      ],
+      "DurationMs": 9.1
+    },
+    {
+      "Id": "ADHC-PRV-001",
+      "Category": "Privileged Access",
+      "Title": "Size of Domain Admins and Enterprise Admins",
+      "Severity": "High",
+      "Status": "Pass",
+      "Message": "Highly privileged group membership is within limits.",
+      "AffectedCount": 0,
+      "Details": [
+        "Domain Admins: 2 member(s)",
+        "Enterprise Admins: 1 member(s)"
+      ],
+      "Recommendation": "Remove everyday and service accounts, delegate narrower rights instead, and adopt a tiered admin model.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/ad-ds/plan/security-best-practices/implementing-least-privilege-administrative-models"
+      ],
+      "DurationMs": 5.4
+    },
+    {
+      "Id": "ADHC-PRV-002",
+      "Category": "Privileged Access",
+      "Title": "Schema Admins is empty",
+      "Severity": "Medium",
+      "Status": "Pass",
+      "Message": "Schema Admins is empty.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Remove all members and add an account only for the duration of a planned schema change.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/ad-ds/plan/security-best-practices/appendix-g--securing-schema-admins-groups-in-active-directory"
+      ],
+      "DurationMs": 3.3
+    },
+    {
+      "Id": "ADHC-PRV-003",
+      "Category": "Privileged Access",
+      "Title": "Privileged accounts are protected from delegation",
+      "Severity": "Medium",
+      "Status": "Pass",
+      "Message": "All enabled privileged accounts are protected from delegation.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Add admin accounts to Protected Users, or set \"Account is sensitive and cannot be delegated\". Test service accounts first: Protected Users blocks NTLM and delegation.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/security/credentials-protection-and-management/protected-users-security-group"
+      ],
+      "DurationMs": 8.7
+    },
+    {
+      "Id": "ADHC-PRV-004",
+      "Category": "Privileged Access",
+      "Title": "Disabled or inactive accounts in privileged groups",
+      "Severity": "High",
+      "Status": "Pass",
+      "Message": "All privileged group members are enabled and active.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Remove disabled and inactive accounts from every privileged group, then review membership on a schedule.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/ad-ds/plan/security-best-practices/reducing-the-active-directory-attack-surface"
+      ],
+      "DurationMs": 6.1
+    },
+    {
+      "Id": "ADHC-REP-001",
+      "Category": "Replication",
+      "Title": "No active replication failures",
+      "Severity": "Critical",
+      "Status": "Pass",
+      "Message": "No replication failures were reported.",
+      "AffectedCount": 0,
+      "Details": [],
+      "Recommendation": "Run repadmin /showrepl and dcdiag /test:replications on the listed servers, fix DNS or connectivity, and check the Directory Service event log.",
+      "References": [
+        "https://learn.microsoft.com/troubleshoot/windows-server/active-directory/diagnose-replication-failures"
+      ],
+      "DurationMs": 3.9
+    },
+    {
+      "Id": "ADHC-REP-002",
+      "Category": "Replication",
+      "Title": "Inbound replication is recent",
+      "Severity": "High",
+      "Status": "Warning",
+      "Message": "1 link(s) have not replicated in 3 hours.",
+      "AffectedCount": 1,
+      "Details": [
+        "dc01.contoso.com <- dc02.contoso.com: last success 6.0 hours ago"
+      ],
+      "Recommendation": "Check site links and schedules, then force replication with repadmin /syncall /AdeP and confirm it succeeds.",
+      "References": [
+        "https://learn.microsoft.com/windows-server/identity/ad-ds/manage/understand-replication-latency"
+      ],
+      "DurationMs": 11.6
+    }
+  ],
+  "CollectionErrors": {},
+  "SkippedCollections": {
+    "Ports": "Network checks were skipped (-SkipNetworkCheck)."
+  },
+  "CollectionTimings": {}
+}
